@@ -10,7 +10,7 @@
         <top.liangzixin.app.mainClass>top.lzx.sample.oauth.AuthCenterApplication</top.liangzixin.app.mainClass>
         <java.version>1.8</java.version>
         <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
-        <spring-security-oauth.version>2.3.3.RELEASE</spring-security-oauth.version>
+        <spring-security-oauth.version>2.3.6.RELEASE</spring-security-oauth.version>
     </properties>
 
     <parent>
