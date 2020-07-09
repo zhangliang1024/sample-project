@@ -1,0 +1,86 @@
+spring:
+  application:
+    name: cloud-zuul-admin
+
+server:
+  maxHttpHeaderSize: 102400
+  port: 9201
+management:
+  endpoints:
+    web.exposure.include: metrics
+    web:
+      exposure:
+        include: ${CLOUD_SHOW_ZUUL_ROUTES}
+  server:
+    port: 9501
+
+
+zuul:
+  routes:
+    svc-platform-user:
+      path: /svc-platform-user/**
+      serviceId: svc-platform-user
+    svc-platform-order:
+      path: /svc-platform-order/**
+      serviceId: svc-platform-order
+  SendErrorFilter:
+    error:
+      disable: false
+  ignored-services: '*'
+  retryable: true
+  ribbon-isolation-strategy: THREAD
+  thread-pool:
+    use-separate-thread-pools: true #每个路由都有自己的线程池，而不是共享一个
+    thread-pool-key-prefix: zuulgw #指定一个线程池前缀方便调试
+
+eureka:
+  instance:
+    preferIpAddress: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 15
+  client:
+#    register-with-eureka: false
+    registry-fetch-interval-seconds: 5
+    serviceUrl:
+      defaultZone: ${CLOUD_EUREKA_DEFAULT_ZONE}
+
+#hystrix:
+#  command:
+#    default:
+#      fallback:
+#        enabled: true
+#      circuitBreaker:
+#        enabled: true
+#      execution:
+#        timeout:
+#          enabled: true
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 15000
+#            interruptOnTimeout: true
+hystrix:
+  threadpool:
+    default:
+      coreSize: 50 #核心线程池
+      maximumSize: 10000 #支持的最大并发量
+      allowMaximumSizeToDivergeFromCoreSize: true #允许 maximumSize 生效
+      maxQueueSize: -1
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 22000
+
+ribbon:
+  ConnectTimeOut: 3000
+  ReadTimeout: 4000
+  MaxAutoRetries: 1 #对当前实例的重试次数
+  MaxAutoRetriesNextServer: 1 #切换实例的重试次数
+  ServerListRefreshInterval: 5000
+
+login:
+  url: ${LOGIN_URL}
+
+log:
+  path: cloud-zuul-logs
+
+

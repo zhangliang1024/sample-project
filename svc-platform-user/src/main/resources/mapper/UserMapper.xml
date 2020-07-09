@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.lzx.sample.svc.platform.user.mapper.UserMapper">
+    <resultMap id="UserMapping" type="top.lzx.sample.svc.platform.entity.entity.User">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <id column="name" property="name" jdbcType="VARCHAR" />
+        <id column="gender" property="gender" jdbcType="VARCHAR" />
+        <id column="mobile" property="mobile" jdbcType="VARCHAR" />
+        <id column="password" property="password" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <insert id="insertUser" parameterType="top.lzx.sample.svc.platform.entity.entity.User" useGeneratedKeys="true"  >
+        insert into user (name,gender,mobile,password)
+        values
+        (#{name},#{gender},#{mobile},#{password})
+    </insert>
+
+    <update id="updateUser" parameterType="top.lzx.sample.svc.platform.entity.entity.User">
+        update user
+        <set>
+            <if test="name !=null and name !=''">
+                name =#{name},
+            </if>
+            <if test="gender !=null and gender !=''">
+                gender =#{gender},
+            </if>
+            <if test="mobile !=null and mobile !=''">
+                mobile =#{mobile},
+            </if>
+            <if test="password !=null and password !=''">
+                password =#{password},
+            </if>
+        </set>
+        where id =#{id}
+    </update>
+
+    <select id="selectUserById" parameterType="java.lang.Integer" resultType="top.lzx.sample.svc.platform.entity.entity.User"  >
+        select * from user where id = #{id}
+    </select>
+
+    <select id="getUserList" resultType="top.lzx.sample.svc.platform.entity.entity.User"  >
+        select * from user
+    </select>
+
+    <delete id="deleteUserById" parameterType="java.lang.Integer">
+      delete from user where id = #{id}
+    </delete>
+
+
+
+
+
+</mapper>

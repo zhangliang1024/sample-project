@@ -1,0 +1,21 @@
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_IMAGE_TAG: $DOCKER_REGISTRY/lzx-ci-sample/db-sample-entity:$CI_COMMIT_REF_NAME
+
+cache:
+  paths:
+    - target
+
+stages:
+   - build
+
+maven-build:
+  stage: build
+  only:
+    - branches
+  except:
+    - master
+  tags:
+    - build
+  script:
+    - mvn install

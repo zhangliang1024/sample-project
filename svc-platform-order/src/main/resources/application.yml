@@ -1,0 +1,61 @@
+top:
+  liangzixin:
+    appName: svc-platform-order
+    port: 9302
+    managementPort: 9602
+
+server:
+  maxHttpHeaderSize: 102400
+  port: ${top.liangzixin.port}
+management:
+  endpoints:
+    web.exposure.include: metrics
+  server:
+    port: ${top.liangzixin.managementPort}
+
+spring:
+  application:
+    name: ${top.liangzixin.appName}
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_LZX_CI_SAMPLE_URL}
+    username: ${DB_LZX_CI_SAMPLE_USERNAME}
+    password: ${DB_LZX_CI_SAMPLE_PASSWORD}
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  typeAliasesPackage: top.liangzixin.cisample.svc.platform.entity.entity
+  global-config:
+    id-type: 0
+    db-column-underline: true
+
+eureka:
+  instance:
+    preferIpAddress: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 15
+  client:
+    serviceUrl:
+      defaultZone: ${CLOUD_EUREKA_DEFAULT_ZONE}
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 50 #核心线程池
+      maximumSize: 10000 #支持的最大并发量
+      allowMaximumSizeToDivergeFromCoreSize: true #允许 maximumSize 生效
+      maxQueueSize: -1
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 22000
+
+ribbon:
+  ConnectTimeOut: 3000
+  ReadTimeout: 4000
+  MaxAutoRetries: 1 #对当前实例的重试次数
+  MaxAutoRetriesNextServer: 1 #切换实例的重试次数
+  ServerListRefreshInterval: 5000
+
+log:
+  path: svc-order-logs

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.lzx.sample.svc.platform.user.mapper.PermissionMapper">
+
+    <select id="selectPermissionListByRoleId"
+            parameterType="java.lang.Integer"
+            resultType="top.lzx.sample.svc.platform.entity.entity.Permission">
+
+        select perm.* from
+           permission perm,role_perm p
+        where perm.id=p.perm_id and p.role_id=#{roleId}
+    </select>
+
+</mapper>

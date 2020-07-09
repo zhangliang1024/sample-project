@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: cloud-monitor
+  security:
+    user:
+      name: user
+      password: password
+  mail:
+#    port: 465
+    host: smtp.126.com
+    username: zhangliang1024_job@126.com
+    password: 1q2w3e4r5t
+    properties:
+      mail:
+        smtp:
+#          socketFactory:
+#            prot: 465
+#            class: javax.net.ssl.SSLSocketFactory
+#            fallback: false
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+  boot:
+    admin:
+      notify:
+        mail:
+          from: zhangliang1024_job@126.com
+          to: zhangliang102411@126.com
+
+server:
+  port: 9206
+management:
+  endpoints:
+    web.exposure.include: "*"
+  endpoint:
+    health:
+      show-details: always
+  server:
+    port: 9506
+
+eureka:
+  instance:
+    preferIpAddress: true
+    metadata-map:
+      user.name: "user"         #These two are needed so that the server
+      user.password: "password" #can access the protected client endpoints
+  client:
+    service-url:
+      defaultZone: ${CLOUD_EUREKA_DEFAULT_ZONE}
+  server:
+    eviction-interval-timer-in-ms: 10000
+    enable-self-preservation: false
+

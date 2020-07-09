@@ -1,0 +1,64 @@
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_IMAGE_TAG: $DOCKER_REGISTRY/lzx-ci-sample/svc-platform-user:$CI_COMMIT_REF_NAME
+
+cache:
+  paths:
+    - target
+
+stages:
+  - build
+  - package
+
+maven-build:
+  stage: build
+  tags:
+    - build
+  script:
+    - mvn package -Dmaven.test.skip=true
+
+docker-build:
+  stage: package
+  only:
+    - branches
+  except:
+    - master
+  tags:
+    - build
+  script:
+    - docker login -u $DOCKER_REGISTRY_BUILDER -p $DOCKER_REGISTRY_BUILDER_PASSWORD $DOCKER_REGISTRY
+    - docker rmi $DOCKER_IMAGE_TAG || true
+    - docker build
+      --label CI_PROJECT_NAME="$CI_PROJECT_NAME"
+      --label CI_PROJECT_NAMESPACE="$CI_PROJECT_NAMESPACE"
+      --label CI_COMMIT_SHA="$CI_COMMIT_SHA"
+      --label CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME"
+      --label CI_COMMIT_TITLE="$CI_COMMIT_TITLE"
+      --label CI_COMMIT_MESSAGE="$CI_COMMIT_MESSAGE"
+      --label CI_PIPELINE_URL="$CI_PIPELINE_URL"
+      --label GITLAB_USER_LOGIN="$GITLAB_USER_LOGIN"
+      -t $DOCKER_IMAGE_TAG .
+    - docker push $DOCKER_IMAGE_TAG
+    - docker logout $DOCKER_REGISTRY
+
+# 重复向 harbor 推送 ID 相同的镜像，将导致 harbor 不能清理原镜像，因此，对于 review-apps 的镜像，我们同时将其标记到一个 recycle 仓库中
+# 以便后期可以在 harbor 中对其进行删除和垃圾回收
+# 参考 https://github.com/goharbor/harbor/blob/master/docs/user_guide.md#deleting-repositories
+docker-recycle:
+  stage: package
+  variables:
+    GIT_STRATEGY: none
+  only:
+    - branches
+  except:
+    - master
+  allow_failure: true
+  tags:
+    - build
+  script:
+    - export datetime=`date +%Y%m%d-%H%M%S`
+    - docker login -u $DOCKER_REGISTRY_BUILDER -p $DOCKER_REGISTRY_BUILDER_PASSWORD $DOCKER_REGISTRY
+    - docker tag $DOCKER_IMAGE_TAG $DOCKER_IMAGE_TAG-$datetime
+    - docker push $DOCKER_IMAGE_TAG-$datetime
+    - docker rmi $DOCKER_IMAGE_TAG-$datetime
+    - docker logout $DOCKER_REGISTRY
